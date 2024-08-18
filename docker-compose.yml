@@ -1,0 +1,26 @@
+services:
+  destination_database:
+    image: postgres:15
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_DB: destination_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    networks:
+      - main_network
+    
+  etl:
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    command: ['python', 'main.py']
+    depends_on:
+      - destination_database
+    
+    networks:
+      - main_network
+
+networks:
+  main_network:
+    driver: bridge
