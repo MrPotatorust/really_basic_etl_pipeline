@@ -5,7 +5,7 @@ from time import perf_counter
 
 import pandas as pd
 import numpy as np
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -13,29 +13,23 @@ logger = logging.getLogger(__name__)
 
 
 
-# def wait_for_postgres(host, max_retries=5, delay_seconds=5):
-#     """Wait for PostgreSQL to become available."""
-#     retries = 0
-#     while retries < max_retries:
-#         try:
-#             result = subprocess.run(
-#                 ["pg_isready", "-h", host], check=True, capture_output=True, text=True)
-#             if "accepting connections" in result.stdout:
-#                 print("Successfully connected to PostgreSQL!")
-#                 return True
-#         except subprocess.CalledProcessError as e:
-#             print(f"Error connecting to PostgreSQL: {e}")
-#             retries += 1
-#             print(
-#                 f"Retrying in {delay_seconds} seconds... (Attempt {retries}/{max_retries})")
-#             time.sleep(delay_seconds)
-#     print("Max retries reached. Exiting.")
-#     return False
+def wait_for_postgres(host, max_retries=5, delay_seconds=5):
+    retries = 0
+    while retries < max_retries:
+        try:
+            result = subprocess.run(
+                ["pg_isready", "-h", host], check=True, capture_output=True, text=True)
+            if "accepting connections" in result.stdout:
+                logger.info("Successfully connected to PostgreSQL!")
+                return True
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error connecting to PostgreSQL: {e}")
+            retries += 1
+            logger.warning(f"Retrying in {delay_seconds} seconds... (Attempt {retries}/{max_retries})")
+            time.sleep(delay_seconds)
+    logger.error(f"Failed to connect to PostgreSQL after {max_retries}")
+    return False
 
-
-# # Use the function before running the ELT process
-# if not wait_for_postgres(host="destination_database"):
-#     exit(1)
 
 
 
@@ -92,12 +86,33 @@ def process_csv(csv):
 
     return csv
 
+def load(csv):
+    try:
+        engine = create_engine('postgresql://admin:password@destination_database:5432/destination_db')
+        logger.info("Engine created")
+        csv.to_sql('my_table', engine, if_exists='replace', index=False)
+
+        # Only for debugging purposes
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM my_table"))
+            logger.info(result.all())
+
+    except Exception as e:
+        logger.error(f"Error creating engine to PostgreSQL: {e}")
 
 def main():
+    if not wait_for_postgres(host="destination_database"):
+        exit(1)
     try:
-        csv = read_csv(r'ETL/datasets/my.csv')
+        csv = read_csv(r'datasets/my.csv')
         processed_csv = process_csv(csv)
+
         logger.info(processed_csv)
+        load(processed_csv)
+        logger.info("Data loaded successfully")
+        
+        print()
+
     except Exception as e:
         logger.error(f"An error occurred: {e}")
 
