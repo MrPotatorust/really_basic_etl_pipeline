@@ -13,9 +13,9 @@ Just go into the root directory and run "docker composer up" in a terminal
 ## Basic table schema:
 #### Movie name, Year of release, Minutes, Genre, Director, Box office collection
 
-Movie name - name of the movie
-Year of release - year of release
-Minutes - the length of the movie in minutes
-Genre - list of movies genres
-Director - the movie director
+Movie name - name of the movie__
+Year of release - year of release__
+Minutes - the length of the movie in minutes__
+Genre - list of movies genres__
+Director - the movie director__
 Box office collection - how much money the movie grossed in dollars
