@@ -1,4 +1,4 @@
-### This is a REALLY basic ETL pipeline
+# This is a REALLY basic ETL pipeline
 
 ## How to run?
 
@@ -11,7 +11,7 @@ Just go into the root directory and run "docker composer up" in a terminal
 2. You can run normal querys on the table "my_table"
 
 ## Basic table schema:
-# Movie name, Year of release, Minutes, Genre, Director, Box office collection
+#### Movie name, Year of release, Minutes, Genre, Director, Box office collection
 
 Movie name - name of the movie
 Year of release - year of release
