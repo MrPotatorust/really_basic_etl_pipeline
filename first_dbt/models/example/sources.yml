@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: staging_db
+    description: staging database
+    database: staging_db
+    schema: public
+    tables:
+      - name: stg_my_table
+        description: "List of films with other details"

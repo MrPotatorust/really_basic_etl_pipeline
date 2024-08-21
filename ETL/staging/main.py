@@ -64,7 +64,6 @@ def process_csv(csv):
 
     csv.drop(columns=['User reviews','Awards', 'Description', 'Rating', 'Ratedby', 'Film Industry', 'Streaming platform'], inplace=True)
 
-
     csv['Box office collection'] = csv['Box office collection'].replace({
             r'[$,]': '', 
             ' NIL': np.nan
@@ -79,7 +78,12 @@ def process_csv(csv):
 
 
     csv['Watch  hour '] = csv['Watch  hour '].apply(calculate_watch_time_minutes)
-    csv.rename(columns={'Watch  hour ': 'Minutes'}, inplace=True)
+    csv.rename(columns={'Watch  hour ': 'minutes',
+                        'Movie name': 'movie_name',
+                        'Year of release': 'year_of_release',
+                        'Box office collection': 'box_office_collection',
+                        'Director': 'director',
+                        'Genre': 'genre'}, inplace=True)
 
     t2=perf_counter()
     logger.info(f"CSV processed successfully in {round(t2-t1, 5)} seconds")
@@ -88,13 +92,13 @@ def process_csv(csv):
 
 def load(csv):
     try:
-        engine = create_engine('postgresql://admin:password@destination_database:5432/destination_db')
+        engine = create_engine('postgresql://admin:password@staging_database:5432/staging_db')
         logger.info("Engine created")
-        csv.to_sql('my_table', engine, if_exists='replace', index=False)
+        csv.to_sql('stg_my_table', engine, if_exists='replace', index=False)
 
         # Only for debugging purposes
         with engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM my_table"))
+            result = conn.execute(text("SELECT * FROM stg_my_table"))
             logger.info(result.all())
 
     except Exception as e:

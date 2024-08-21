@@ -1,8 +1,19 @@
 services:
-  destination_database:
+  staging_database:
     image: postgres:15
     ports:
       - '5433:5432'
+    environment:
+      POSTGRES_DB: staging_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    networks:
+      - main_network
+    
+  destination_database:
+    image: postgres:15
+    ports:
+      - '5434:5432'
     environment:
       POSTGRES_DB: destination_db
       POSTGRES_USER: admin
@@ -10,9 +21,9 @@ services:
     networks:
       - main_network
     
-  etl:
+  etl_staging:
     build:
-      context: ./etl
+      context: ./etl/staging
       dockerfile: Dockerfile
     command: ['python', 'main.py']
     depends_on:
@@ -20,6 +31,41 @@ services:
     
     networks:
       - main_network
+
+  etl_destination:
+    build:
+      context: ./etl/destination
+      dockerfile: Dockerfile
+    command: ['python', 'el.py']
+    depends_on:
+      dbt:
+        condition: service_completed_successfully
+    
+    networks:
+      - main_network
+
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.8.2
+    command: 
+      [
+        "run",
+        "--profiles-dir",
+        "/root",
+        "--project-dir",
+        "/dbt"
+      ]
+    networks:
+      - main_network
+    volumes:
+      - ./first_dbt:/dbt
+      - ~/.dbt:/root
+    environment:
+      DBT_PROFILE: first_dbt
+      DBT_TARGET: dev
+    depends_on:
+      etl_staging:
+        condition: service_completed_successfully
 
 networks:
   main_network:

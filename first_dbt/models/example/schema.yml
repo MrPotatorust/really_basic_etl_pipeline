@@ -1,0 +1,23 @@
+
+version: 2
+
+models:
+  - name: test
+    description: "Table that contains movies and details about them"
+    columns:
+      - name: Movie_name
+        tests:
+          - not_null
+      - name: Year_of_release
+        tests:
+          - not_null
+      - name: Minutes
+        tests:
+          - not_null
+      - name: Genre
+        tests:
+          - not_null
+      - name: Director
+        tests:
+          - not_null
+      - name: Box_office_collection
