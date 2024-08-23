@@ -6,7 +6,7 @@ WORKDIR /app
 
 
 RUN apt-get update && apt-get install -y postgresql-client
-RUN pip install -r requirements.txt
+RUN pip install pandas sqlalchemy psycopg2-binary
 
 COPY main.py .
 CMD ["python", "main.py"]

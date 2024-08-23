@@ -6,7 +6,7 @@ WORKDIR /app
 
 
 RUN apt-get update && apt-get install -y postgresql-client
-RUN pip install -r requirements.txt
+RUN pip install sqlalchemy psycopg2-binary
 
 COPY el.py .
 CMD ["python", "el.py"]
