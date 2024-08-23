@@ -1,5 +1,3 @@
-import time
-from time import perf_counter
 import logging
 
 from sqlalchemy import create_engine, text, MetaData, Table, Column, Integer, String

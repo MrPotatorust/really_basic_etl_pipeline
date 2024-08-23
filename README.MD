@@ -19,3 +19,9 @@ Minutes - the length of the movie in minutes
 Genre - list of movies genres  
 Director - the movie director  
 Box office collection - how much money the movie grossed in dollars
+
+## In the destination database:
+#### ID, Movie name:
+
+ID - auto increment id
+Movie name - the name of the movie
